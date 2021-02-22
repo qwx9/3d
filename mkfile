@@ -1,6 +1,7 @@
 </$objtype/mkfile
 TARG=\
 	3d01\
+	3d02\
 
 OFILES=\
 	drw.$O\

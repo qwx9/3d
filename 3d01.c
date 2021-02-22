@@ -1,3 +1,5 @@
+/* absolute basic: global 2d topdown map view */
+
 #include <u.h>
 #include <libc.h>
 #include <thread.h>
@@ -89,7 +91,6 @@ stepsim(void)
 			k->fn();
 }
 
-/* absolute map: global 2d topdown view */
 static void
 render(void)
 {
