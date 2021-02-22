@@ -1,4 +1,5 @@
-/* global map + transformed map + perspective */
+/* global map + transformed map + perspective,
+ * floating point coordinates */
 
 #include <u.h>
 #include <libc.h>
@@ -10,7 +11,7 @@
 enum{
 	Hz = 30,
 };
-char *progname = "3d03";
+char *progname = "3d05";
 
 int tdiv = Te3 / Hz;
 
@@ -30,7 +31,7 @@ struct Player{
 	double θ;
 };
 static Player player;
-static Rectangle wall;
+static Fectangle wall;
 
 static void
 forward(void)
@@ -96,14 +97,15 @@ static void
 render(void)
 {
 	Player pl;
-	Rectangle r, wl, rwl, top, bottom;
+	Fectangle r, wl, rwl;
+	Rectangle top, bottom;
 
 	draw(fb, fb->r, col[Cbg], nil, ZP);
 	wl = wall;
 	pl = player;
 
 	/* absolute map */
-	line(fb, wl.min, wl.max, 0, 0, 1, col[Cwall], ZP);
+	line(fb, PFt(wl.min), PFt(wl.max), 0, 0, 1, col[Cwall], ZP);
 	ellipse(fb, Pt(pl.x, pl.y), 2, 2, 0, col[Cplayer], ZP);
 	line(fb, Pt(pl.x, pl.y),
 		Pt(pl.x + cos(player.θ) * 15, pl.y + sin(player.θ) * 15),
@@ -125,7 +127,7 @@ render(void)
 	r.min.y = pl.y - rwl.min.y;
 	r.max.x = pl.x - rwl.max.x;
 	r.max.y = pl.y - rwl.max.y;
-	line(fb, r.min, r.max, 0, 0, 1, col[Cwall], ZP);
+	line(fb, PFt(r.min), PFt(r.max), 0, 0, 1, col[Cwall], ZP);
 	ellipse(fb, Pt(pl.x, pl.y), 2, 2, 0, col[Cplayer], ZP);
 	line(fb, Pt(pl.x, pl.y),
 		Pt(pl.x + cos(-PI/2) * 15, pl.y + sin(-PI/2) * 15),
@@ -133,8 +135,10 @@ render(void)
 
 	/* perspective-transformed map:
 	 * just take the transformed wall coordinates and divide by depth */
-	if(rwl.min.y == 0 || rwl.max.y == 0)
-		return;
+	if(rwl.min.y == 0)
+		rwl.min.y = 1;
+	if(rwl.max.y == 0)
+		rwl.max.y = 1;
 	/* length of the wall = 50 (euclidean distance), we divide for smaller viewsize */
 	top.min.x = 50 + (double)rwl.min.x * 50/2 / rwl.min.y;
 	top.max.x = 50 + (double)rwl.max.x * 50/2 / rwl.max.y;
@@ -167,7 +171,7 @@ initrender(void)
 static void
 initsim(void)
 {
-	wall = Rect(70, 20, 70, 70);
+	wall = (Fectangle){(Foint){70, 20}, (Foint){70, 70}};
 	player = (Player){(Foint){50, 50}, 0};
 }
 

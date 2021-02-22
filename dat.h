@@ -1,5 +1,6 @@
 typedef struct Key Key;
 typedef struct Foint Foint;
+typedef struct Fectangle Fectangle;
 
 enum{
 	Te9 = 1000000000,
@@ -22,6 +23,10 @@ extern Rectangle fbr;
 struct Foint{
 	double x;
 	double y;
+};
+struct Fectangle{
+	Foint min;
+	Foint max;
 };
 
 extern char *progname;

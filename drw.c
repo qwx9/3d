@@ -20,6 +20,18 @@ eallocimage(Rectangle r, ulong chan, int repl, ulong col)
 	return i;
 }
 
+Point
+PFt(Foint p)
+{
+	return (Point){p.x, p.y};
+}
+
+Rectangle
+RFect(Fectangle r)
+{
+	return (Rectangle){PFt(r.min), PFt(r.max)};
+}
+
 void
 updatedraw(void)
 {
