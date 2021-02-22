@@ -2,6 +2,8 @@
 TARG=\
 	3d01\
 	3d02\
+	3d03\
+	3d04\
 
 OFILES=\
 	drw.$O\

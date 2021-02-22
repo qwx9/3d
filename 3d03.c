@@ -1,7 +1,4 @@
-/* global map + transformed map
- * like in opengl, the player's position on the transformed map
- * is fixed, and the world around it moves.
- */
+/* global map + transformed map + perspective */
 
 #include <u.h>
 #include <libc.h>
@@ -13,7 +10,7 @@
 enum{
 	Hz = 30,
 };
-char *progname = "3d02";
+char *progname = "3d03";
 
 int tdiv = Te3 / Hz;
 
@@ -98,7 +95,7 @@ static void
 render(void)
 {
 	Player pl;
-	Rectangle wl, rwl;
+	Rectangle r, wl, rwl, top, bottom;
 
 	draw(fb, fb->r, col[Cbg], nil, ZP);
 	wl = wall;
@@ -116,38 +113,42 @@ render(void)
 	wl.min.y -= pl.y;
 	wl.max.x -= pl.x;
 	wl.max.y -= pl.y;
-	/* ... but don't rotate */
-	rwl = wl;
-	/* offset to second view */
+	rwl.min.x = wl.min.x * sin(player.θ) - wl.min.y * cos(player.θ);
+	rwl.min.y = wl.min.x * cos(player.θ) + wl.min.y * sin(player.θ);	/* now left depth (since camera looks towards -∞ along y axis */
+	rwl.max.x = wl.max.x * sin(player.θ) - wl.max.y * cos(player.θ);
+	rwl.max.y = wl.max.x * cos(player.θ) + wl.max.y * sin(player.θ);	/* now right depth */
+	/* offset view */
 	pl.x = 200;
 	pl.y = 50;
-	rwl.min.x = pl.x - rwl.min.x;
-	rwl.min.y = pl.y - rwl.min.y;
-	rwl.max.x = pl.x - rwl.max.x;
-	rwl.max.y = pl.y - rwl.max.y;
-	line(fb, rwl.min, rwl.max, 0, 0, 1, col[Cwall], ZP);
-	ellipse(fb, Pt(pl.x, pl.y), 2, 2, 0, col[Cplayer], ZP);
-	line(fb, Pt(pl.x, pl.y),
-		Pt(pl.x + cos(-PI/2) * 15, pl.y + sin(-PI/2) * 15),	/* neg since y is flipped */
-		0, 0, 0, col[Carrow], ZP);
-
-	/* same, but do rotate */
-	rwl = wl;
-	rwl.min.x = wl.min.x * sin(player.θ) - wl.min.y * cos(player.θ);
-	rwl.min.y = wl.min.x * cos(player.θ) + wl.min.y * sin(player.θ);
-	rwl.max.x = wl.max.x * sin(player.θ) - wl.max.y * cos(player.θ);
-	rwl.max.y = wl.max.x * cos(player.θ) + wl.max.y * sin(player.θ);
-	/* offset to third view */
-	pl.x = 300;
-	rwl.min.x = pl.x - rwl.min.x;
-	rwl.min.y = pl.y - rwl.min.y;
-	rwl.max.x = pl.x - rwl.max.x;
-	rwl.max.y = pl.y - rwl.max.y;
-	line(fb, rwl.min, rwl.max, 0, 0, 1, col[Cwall], ZP);
+	r.min.x = pl.x - rwl.min.x;
+	r.min.y = pl.y - rwl.min.y;
+	r.max.x = pl.x - rwl.max.x;
+	r.max.y = pl.y - rwl.max.y;
+	line(fb, r.min, r.max, 0, 0, 1, col[Cwall], ZP);
 	ellipse(fb, Pt(pl.x, pl.y), 2, 2, 0, col[Cplayer], ZP);
 	line(fb, Pt(pl.x, pl.y),
 		Pt(pl.x + cos(-PI/2) * 15, pl.y + sin(-PI/2) * 15),
 		0, 0, 0, col[Carrow], ZP);
+
+	/* perspective-transformed map:
+	 * just take the transformed wall coordinates and divide by depth */
+	if(rwl.min.y == 0 || rwl.max.y == 0)
+		return;
+	/* length of the wall = 50 (euclidean distance), we divide for smaller viewsize */
+	top.min.x = 50 + (double)rwl.min.x * 50/2 / rwl.min.y;
+	top.max.x = 50 + (double)rwl.max.x * 50/2 / rwl.max.y;
+	top.min.y = 50 + -50 / (double)rwl.min.y;
+	top.max.y = 50 + -50 / (double)rwl.max.y;
+	bottom.min.x = top.min.x;
+	bottom.max.x = top.max.x;
+	bottom.min.y = 50 + 50 / (double)rwl.min.y;
+	bottom.max.y = 50 + 50 / (double)rwl.max.y;
+	/* offset view */
+	pl.x = 300;
+	top = rectaddpt(top, Pt(pl.x, pl.y));
+	bottom = rectaddpt(bottom, Pt(pl.x, pl.y));
+	line(fb, top.min, top.max, 0, 0, 1, col[Cwall], ZP);
+	line(fb, bottom.min, bottom.max, 0, 0, 1, col[Cwall], ZP);
 }
 
 static void
