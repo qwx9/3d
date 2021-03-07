@@ -82,6 +82,7 @@ kproc(void *)
 	if((fd = open("/dev/kbd", OREAD)) < 0)
 		sysfatal("kproc: %r");
 	memset(buf, 0, sizeof buf);
+	memset(down, 0, sizeof down);
 	for(;;){
 		if(buf[0] != 0){
 			n = strlen(buf)+1;
@@ -119,7 +120,6 @@ timeproc(void *)
 		nbsendul(tmc, 0);
 	}
 }
-
 
 void
 sim(void)
