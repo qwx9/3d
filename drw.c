@@ -26,6 +26,12 @@ PFt(Foint p)
 	return (Point){p.x, p.y};
 }
 
+Foint
+Ft(double x, double y)
+{
+	return (Foint){x, y};
+}
+
 Rectangle
 RFect(Fectangle r)
 {

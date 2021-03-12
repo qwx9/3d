@@ -4,6 +4,7 @@ void	sysinit(void (*)(void), void (*)(void), void (*)(void), void (*)(void));
 Image*	eallocimage(Rectangle, ulong, int, ulong);
 Point	PFt(Foint);
 Rectangle	RFect(Fectangle);
+Foint	Ft(double, double);
 void	updatedraw(void);
 void	redraw(void);
 void	resetdraw(void);
