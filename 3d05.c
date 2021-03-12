@@ -140,8 +140,8 @@ render(void)
 	if(rwl.max.y == 0)
 		rwl.max.y = 1;
 	/* length of the wall = 50 (euclidean distance), we divide for smaller viewsize */
-	top.min.x = 50 + (double)rwl.min.x * 50/2 / rwl.min.y;
-	top.max.x = 50 + (double)rwl.max.x * 50/2 / rwl.max.y;
+	top.min.x = 50 - (double)rwl.min.x * 50/2 / rwl.min.y;
+	top.max.x = 50 - (double)rwl.max.x * 50/2 / rwl.max.y;
 	top.min.y = 50 + -50 / (double)rwl.min.y;
 	top.max.y = 50 + -50 / (double)rwl.max.y;
 	bottom.min.x = top.min.x;

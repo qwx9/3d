@@ -137,9 +137,9 @@ render(void)
 	/* offset view */
 	pl.x = 300;
 	/* 50: length of the wall (euclidean distance) */
-	top.min.x = 50/2 * (double)rwl.min.x / rwl.min.y;
+	top.min.x = -50/2 * (double)rwl.min.x / rwl.min.y;
 	top.min.y = (double)top.min.x / rwl.min.y;
-	top.max.x = 50/2 * (double)rwl.max.x / rwl.max.y;
+	top.max.x = -50/2 * (double)rwl.max.x / rwl.max.y;
 	top.max.y = (double)top.min.x / rwl.max.y;
 	r = rectaddpt(top, Pt(pl.x, pl.y));
 	line(fb, r.min, r.max, 0, 0, 1, col[Cwall], ZP);
